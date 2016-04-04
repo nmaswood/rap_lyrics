@@ -82,35 +82,43 @@ class scrape():
 
                 for link_unit in links_prime:
                     if "?action=edit" not in link_unit:
-                        sleep(.25)
+                        print ("link_unit", link_unit)
 
                         song_name = link_unit.split("/wiki/")[-1]
                         song_url = "http://lyrics.wikia.com" + link_unit
-                        html = requests.get(song_url).text
-                        bs_obj_prime = BeautifulSoup(html, 'lxml')
-                        lyrics = bs_obj_prime.select("#mw-content-text > div.lyricbox")[0]
+                        if db["LYRICS"].find_one({"song_name": song_name}) == None:
+                            try:
+                                html = requests.get(song_url).text
+                                sleep(.25)
 
-                        [s.extract() for s in lyrics('script')]
-                        for child in lyrics:
-                            if isinstance(child,Comment):
-                                child.extract()
-                        raw_lyrics = str(lyrics).replace("<br>", " ").replace("<br/>", " ").replace('<div class="lyricbox">', "").replace('<div class="lyricsbreak">', "").replace('</div>', "").strip()
+                                bs_obj_prime = BeautifulSoup(html, 'lxml')
+                                lyrics = bs_obj_prime.select("#mw-content-text > div.lyricbox")[0]
+
+                                [s.extract() for s in lyrics('script')]
+                                for child in lyrics:
+                                    if isinstance(child,Comment):
+                                        child.extract()
+                                raw_lyrics = str(lyrics).replace("<br>", " ").replace("<br/>", " ").replace('<div class="lyricbox">', "").replace('<div class="lyricsbreak">', "").replace('</div>', "").strip()
 
 
-                        lang_data = bs_obj_prime.select("#song-lang > a")
-                        language = lang_data[0].get("title") if len(lang_data) > 0 else "UNK"
+                                lang_data = bs_obj_prime.select("#song-lang > a")
+                                language = lang_data[0].get("title") if len(lang_data) > 0 else "UNK"
 
-                        db["LYRICS"].insert(
-                            {
-                            "song_url"   : song_url,
-                            "song_name"  : song_name, 
-                            "referer"    : url,
-                            "artist"     : artist,
-                            "album"      : album, 
-                            "year"       : year,
-                            "lyrics"     : raw_lyrics
-                            })
-                        print (song_name, artist, album, year)
+                                db["LYRICS"].insert(
+                                    {
+                                    "song_url"   : song_url,
+                                    "song_name"  : song_name, 
+                                    "referer"    : url,
+                                    "artist"     : artist,
+                                    "album"      : album, 
+                                    "year"       : year,
+                                    "lyrics"     : raw_lyrics
+                                    })
+                                print (song_name, artist, album, year)
+                            except Exception as e:
+                                print(e)
+                                print ("failure on", song_url )
+
 
 if __name__ == '__main__':
     
