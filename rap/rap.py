@@ -97,7 +97,8 @@ class scrape():
                         raw_lyrics = str(lyrics).replace("<br>", " ").replace("<br/>", " ").replace('<div class="lyricbox">', "").replace('<div class="lyricsbreak">', "").replace('</div>', "").strip()
 
 
-                        language = bs_obj_prime.select("#song-lang > a")[0].get("title")
+                        lang_data = bs_obj_prime.select("#song-lang > a")
+                        language = lang_data[0].get("title") if len(lang_data) > 0 else "UNK"
 
                         db["LYRICS"].insert(
                             {
