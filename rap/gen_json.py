@@ -7,7 +7,7 @@ class extract():
 
     def __init__(self):
         self.client    = MongoClient('localhost',27017)['RAP']
-        self.db        = self.client['LYRICS']
+        self.db        = self.client['LYRICSNEW']
 
     def gen(self):
 
@@ -24,7 +24,6 @@ class extract():
 
         with open ('data.json','w') as jsonout:
             json.dump(data, jsonout)
-
 
 if __name__ == '__main__':
     
