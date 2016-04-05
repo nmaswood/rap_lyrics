@@ -86,7 +86,8 @@ class scrape():
 
                         song_name = link_unit.split("/wiki/")[-1]
                         song_url = "http://lyrics.wikia.com" + link_unit
-                        if db["LYRICS"].find_one({"song_name": song_name}) == None:
+                        if db["LYRICSNEW"].find_one({"song_name": song_name}) == None:
+                            print ("unique entry")
                             try:
                                 html = requests.get(song_url).text
                                 sleep(.25)
@@ -104,7 +105,7 @@ class scrape():
                                 lang_data = bs_obj_prime.select("#song-lang > a")
                                 language = lang_data[0].get("title") if len(lang_data) > 0 else "UNK"
 
-                                db["LYRICS"].insert(
+                                db["LYRICSNEW"].insert(
                                     {
                                     "song_url"   : song_url,
                                     "song_name"  : song_name, 
@@ -112,9 +113,10 @@ class scrape():
                                     "artist"     : artist,
                                     "album"      : album, 
                                     "year"       : year,
-                                    "lyrics"     : raw_lyrics
+                                    "lyrics"     : raw_lyrics,
+                                    "language"   : language
                                     })
-                                print (song_name, artist, album, year)
+                                print (song_url, song_name, artist, album, year,language)
                             except Exception as e:
                                 print(e)
                                 print ("failure on", song_url )
